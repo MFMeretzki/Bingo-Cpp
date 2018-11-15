@@ -3,8 +3,7 @@
 
 server_objects =  Server/server.o
 client_objects = Client/client.o
-lib_objects = Lib/Socket.o Lib/ServerSocket.o Lib/ClientSocket.o
-
+lib_objects = Bin/Socket.o Bin/ServerSocket.o Bin/ClientSocket.o Bin/ConcurrentOutput.o Bin/EventDispatcher.o
 
 all : server client
 
@@ -37,19 +36,25 @@ client: client.cpp
 
 lib: $(lib_objects)
 
-Socket.o: Lib/Socket.cpp
-	g++ -std=gnu++11 -Wall -c -o Lib/Socket.o Lib/Socket.cpp
+Bin/Socket.o: Lib/Socket.cpp
+	g++ -std=gnu++11 -Wall -c -o Bin/Socket.o Lib/Socket.cpp
 
-ServerSocket: Lib/ServerSocket.cpp
-	g++ -std=gnu++11 -Wall -c -o Lib/ServerSocket.o Lib/ServerSocket.cpp
+Bin/ServerSocket.o: Lib/ServerSocket.cpp
+	g++ -std=gnu++11 -Wall -c -o Bin/ServerSocket.o Lib/ServerSocket.cpp
 	
-ClientSocket: Lib/ClientSocket.cpp
-	g++ -std=gnu++11 -Wall -c -o Lib/ClientSocket.o Lib/ClientSocket.cpp
+Bin/ClientSocket.o: Lib/ClientSocket.cpp
+	g++ -std=gnu++11 -Wall -c -o Bin/ClientSocket.o Lib/ClientSocket.cpp
+
+Bin/ConcurrentOutput.o: Lib/ConcurrentOutput.cpp
+	g++ -std=gnu++11 -Wall -c -o Bin/ConcurrentOutput.o Lib/ConcurrentOutput.cpp
+
+Bin/EventDispatcher.o: Lib/EventDispatcher.cpp
+	g++ -std=gnu++11 -Wall -c -o Bin/EventDispatcher.o Lib/EventDispatcher.cpp
 
 
+
+# Clean rules ---------------------
 
 clean:
-	rm -fv *.o server client
-	rm -fv Lib/*.o
-	rm -fv Server/*.o
-	rm -fv Client/*.o
+	rm -fv server client
+	rm -fv Bin/*.o
