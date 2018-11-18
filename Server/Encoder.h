@@ -13,11 +13,11 @@ public:
 	enum Command:unsigned short {
 		CLIENT_CONNECTED = 1,
 		GET_CARD = 2,
-		STARTING_NEW_GAME = 10,
-		CARDS_RESPONSE = 11,
-		BALL_REVEALED = 12,
-		GAME_BEGAN = 13,
-		CREDIT = 14
+		STARTING_NEW_GAME = 3,
+		CARDS_RESPONSE = 4,
+		BALL_REVEALED = 5,
+		GAME_BEGAN = 6,
+		CREDIT = 7
 	};
 	
 	static std::string EncodeBase(unsigned short commandId);
@@ -27,6 +27,10 @@ public:
 	
 	static unsigned short CommandID (std::string command);
 	static bool DecodeUShort(std::string command, unsigned short& value);
+	
+	static std::string FormatValue(unsigned short);
+	
+private:
 	
 };
 
