@@ -4,7 +4,7 @@
 std::string Encoder::EncodeBase(unsigned short commandId)
 {
 	std::string command;
-	command += commandId;
+	command += commandId + '0';
 	
 	return command;
 }
@@ -13,8 +13,8 @@ std::string Encoder::EncodeBase(unsigned short commandId)
 std::string Encoder::EncodeUShort(unsigned short commandId, unsigned short value)
 {
 	std::string command;
-	command += commandId;
-	command += value;
+	command += commandId + '0';
+	command += value + '0';
 	
 	return command;
 }
@@ -23,30 +23,40 @@ std::string Encoder::EncodeUShort(unsigned short commandId, unsigned short value
 std::string Encoder::EncodeUShort3(unsigned short commandId, unsigned short value[3])
 {
 	std::string command;
-	command += commandId;
+	command += commandId + '0';
 	
 	for (int i=0; i<3; ++i)
 	{
-		command += value[i];
+		command += value[i] + '0';
 	}
 	
 	return command;
 }
 
 
-std::string Encoder::EncodeCards(unsigned short commandId, unsigned short nCards, Card card[])
+std::string Encoder::EncodeCards(unsigned short commandId, std::list<Card> cards)
 {
 	std::string command;
-	command += commandId;
-	command += nCards;
+	command += commandId + '0';
+	command += cards.size() + '0';
 	
-	int i;
-	for (i=0; i<nCards; ++i)
+	for (auto it = cards.begin(); it != cards.end(); ++it)
 	{
-		command += card[i].StringCode();
+		command += it->StringCode();
 	}
 	
 	return command;
+}
+
+
+unsigned short Encoder::CommandID (std::string command)
+{
+	unsigned short code = 0;
+	
+	if (command.size() > 0) 
+		code = command[0] - '0';
+	
+	return code;
 }
 
 

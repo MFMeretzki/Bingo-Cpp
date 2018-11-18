@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <mutex>
+#include <ctime>
 
 
 class GameState
@@ -35,9 +36,9 @@ public:
 	
 	~GameState();
 	
-	virtual void ProcessCommand (ClientData client, std::string command) = 0;
-	virtual void ClientConnect (ClientData client) = 0;
-	virtual bool ClientDisconnect (ClientData client) = 0;
+	virtual void ProcessCommand (ClientData *client, std::string command) = 0;
+	virtual void ClientConnect (ClientData *client) = 0;
+	virtual bool ClientDisconnect (ClientData *client) = 0;
 	
 	void SendToAllPlayers (std::string command);
 	void SendToOtherPlayers (unsigned long id, std::string command);
@@ -45,17 +46,17 @@ public:
 	State actualState;
 	EventDispatcher ChangeState;
 	
-	
-	
-protected:
-	
-	GameState(std::map<unsigned long, Player> players, std::map<unsigned long, ClientData> *clients);
+	GameState(
+		std::map<unsigned long, Player> players,
+		std::map<unsigned long, ClientData> *clients
+	);
 	
 	const unsigned short MAX_NUMBER = 90;
 	std::map<unsigned long, Player> players;
 	std::map<unsigned long, ClientData> *clients;
 	std::list<unsigned short> baseNumbersList;
-	std::mutex stateLock;
+	static std::mutex stateLock;
+	
 	
 };
 

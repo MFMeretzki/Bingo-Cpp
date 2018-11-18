@@ -51,7 +51,20 @@ std::string Card::StringCode ()
 	
 	for (int i=0; i<15; ++i)
 	{
-		code += this->values[i];
+		code += this->values[i] + '0';
+	}
+
+	return code;
+}
+
+
+
+std::string Card::SStringCode (unsigned short values[15]){
+	std::string code ;
+	
+	for (int i=0; i<15; ++i)
+	{
+		code += values[i] + '0';
 	}
 
 	return code;

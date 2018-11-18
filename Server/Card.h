@@ -13,6 +13,7 @@ public:
 	~Card();
 	unsigned short EvaluateBall (unsigned short ball);
 	std::string StringCode ();
+	static std::string SStringCode (unsigned short values[15]);
 	
 	unsigned short ID;
 	unsigned short values[15];

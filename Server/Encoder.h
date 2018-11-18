@@ -2,6 +2,7 @@
 #define Encoder_class
 
 #include "Card.h"
+#include <list>
 #include <string>
 
 
@@ -22,8 +23,9 @@ public:
 	static std::string EncodeBase(unsigned short commandId);
 	static std::string EncodeUShort(unsigned short commandId, unsigned short value);
 	static std::string EncodeUShort3(unsigned short commandId, unsigned short value[3]);
-	static std::string EncodeCards(unsigned short commandId, unsigned short nCards, Card card[]);
+	static std::string EncodeCards(unsigned short commandId, std::list<Card> cards);
 	
+	static unsigned short CommandID (std::string command);
 	static bool DecodeUShort(std::string command, unsigned short& value);
 	
 };
