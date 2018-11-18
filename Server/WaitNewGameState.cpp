@@ -2,13 +2,13 @@
 
 
 WaitNewGameState::WaitNewGameState (
-	std::map<unsigned long, GameState::Player> players,
+	std::map<unsigned long, GameState::Player> *players,
 	std::map<unsigned long, ClientData> *clients
 ) : GameState (players, clients)
 {
 	this->alive = true;
 	this->actualState = GameState::State::WAIT_NEW_GAME;
-	this->players.clear();
+	this->players->clear();
 	
 	std::thread(StartNewGameThread, this).detach();
 }
@@ -85,13 +85,13 @@ bool WaitNewGameState::ClientDisconnect (ClientData *client)
 {
 	bool ok = true;
 	
-	auto it = this->players.begin();
-	while (it != this->players.end() && ok)
+	auto it = this->players->begin();
+	while (it != this->players->end() && ok)
 	{
 		if (it->first == client->client->ID)
 		{
 			this->stateLock.lock();
-			this->players.erase(it);
+			this->players->erase(it);
 			this->stateLock.unlock();
 			ok = false;
 		}
@@ -139,7 +139,7 @@ void WaitNewGameState::SendCards (ClientData *client, unsigned short nCards)
 			}
 			
 			Player player(cards,client);
-			players.insert(std::pair<unsigned long, Player>(client->client->ID, player));
+			players->insert(std::pair<unsigned long, Player>(client->client->ID, player));
 			
 			std::string command = Encoder::EncodeCards(Encoder::Command::CARDS_RESPONSE, cards);
 			client->client->Write(command);
@@ -182,7 +182,7 @@ Card WaitNewGameState::GenerateCard ()
 void WaitNewGameState::StartNewGameThread (WaitNewGameState *obj)
 {
 	do {
-		if (obj->players.size() == 0)
+		if (obj->players->size() == 0)
 		{
 			ConcurrentOutput::Write("WAIT_NEW_GAME");
 			obj->startTime = std::chrono::high_resolution_clock::now();

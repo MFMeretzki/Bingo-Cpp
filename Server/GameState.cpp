@@ -1,7 +1,7 @@
 #include "GameState.h"
 
 
-GameState::GameState(std::map<unsigned long, Player> players, std::map<unsigned long, ClientData> *clients)
+GameState::GameState(std::map<unsigned long, Player> *players, std::map<unsigned long, ClientData> *clients)
 {
 	this->players = players;
 	this->clients = clients;
@@ -19,7 +19,7 @@ GameState::~GameState() { }
 
 void GameState::SendToAllPlayers (std::string command)
 {
-	for (auto it = this->players.begin(); it != this->players.end(); ++it)
+	for (auto it = this->players->begin(); it != this->players->end(); ++it)
 	{
 		it->second.clientData->client->Write(command);
 	}
@@ -28,7 +28,7 @@ void GameState::SendToAllPlayers (std::string command)
 
 void GameState::SendToOtherPlayers (unsigned long id, std::string command)
 {
-	for (auto it = this->players.begin(); it != this->players.end(); ++it)
+	for (auto it = this->players->begin(); it != this->players->end(); ++it)
 	{
 		if (it->first != id)
 			it->second.clientData->client->Write(command);

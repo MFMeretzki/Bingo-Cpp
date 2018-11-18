@@ -16,7 +16,7 @@ class WaitNewGameState : public GameState
 public:
 	
 	WaitNewGameState (
-		std::map<unsigned long, GameState::Player> players,
+		std::map<unsigned long, GameState::Player> *players,
 		std::map<unsigned long, ClientData> *clients
 	);
 	~WaitNewGameState();

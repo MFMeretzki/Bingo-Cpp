@@ -3,10 +3,10 @@
 
 VPATH = Bin Lib Server
 CXXFLAGS = -std=gnu++11 -Wall
-INC = -I/home/grunash/Projects/BingoCpp/Lib
+INC = -I/home/grunash/Projects/BingoCpp/Lib -I/home/grunash/Projects/BingoCpp/Server
 
-server_objects =  Server/server.o
-client_objects = Client/client.o
+server_objects = ClientConnection.o ClientData.o Card.o Encoder.o GameState.o WaitNewGameState.o GameStartedState.o GameLogic.o
+client_objects = 
 lib_objects = Socket.o ServerSocket.o ClientSocket.o ConcurrentOutput.o EventDispatcher.o
 lib_headers = Socket.h ServerSocket.h ClientSocket.h ConcurrentOutput.h EventDispatcher.h
 
@@ -18,11 +18,12 @@ all : server client
 
 # Server Objects -------------------
 
+
+
 server_: $(server_objects)
 	g++ -std=gnu++11 -pthread -o server $(server_objects)
 
-server: server.cpp
-	g++ -std=gnu++11 -c server.cpp -pthread
+server: $(server_objects)
 
 Bin/ClientConnection.o: ClientConnection.cpp
 	g++ -c $(CXXFLAGS) $^ -o $@ $(INC)
@@ -39,15 +40,14 @@ Bin/Encoder.o: Encoder.cpp
 Bin/GameState.o: GameState.cpp
 	g++ -c $(CXXFLAGS) $^ -o $@ $(INC)
 
+Bin/WaitNewGameState.o: WaitNewGameState.cpp
+	g++ -c $(CXXFLAGS) $^ -o $@ $(INC)
 
+Bin/GameStartedState.o: GameStartedState.cpp
+	g++ -c $(CXXFLAGS) $^ -o $@ $(INC)
 
-# Client Objects -------------------
-
-client_: $(client_objects)
-	g++ -std=gnu++11 -pthread -o client $(client_objects)
-	
-client: client.cpp
-	g++ -std=gnu++11 -c client.cpp -pthread
+Bin/GameLogic.o: GameLogic.cpp
+	g++ -c $(CXXFLAGS) $^ -o $@ $(INC)
 
 
 

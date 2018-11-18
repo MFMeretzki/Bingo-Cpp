@@ -21,6 +21,10 @@ public:
 	std::list<unsigned short> marked[3];
 	bool completeLine[3];
 	
+private:
+	
+	static std::string FormatValue(unsigned short);
+	
 };
 
 

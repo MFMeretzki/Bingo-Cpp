@@ -4,15 +4,22 @@
 #include "Listener.h"
 #include <list>
 
-struct Pair {
-	Listener *l;
-	void (*FuncPTR)(Listener *l,int value);
-};
-
 
 class EventDispatcher {
 	
 	public:
+
+		struct Pair {
+			Listener *l;
+			void (*FuncPTR)(Listener *l,int value);
+			
+			Pair(Listener *l, void (*FuncPTR)(Listener *l,int value))
+			{
+				this->l = l;
+				this->FuncPTR = FuncPTR;
+			}
+		};
+		
 		EventDispatcher() { }
 		virtual ~EventDispatcher() { }
 		void addListener(Pair*);

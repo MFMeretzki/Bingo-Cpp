@@ -34,7 +34,11 @@ public:
 		}
 	};
 	
-	~GameState();
+	GameState(
+		std::map<unsigned long, Player> *players,
+		std::map<unsigned long, ClientData> *clients
+	);
+	virtual ~GameState() = 0;
 	
 	virtual void ProcessCommand (ClientData *client, std::string command) = 0;
 	virtual void ClientConnect (ClientData *client) = 0;
@@ -43,16 +47,12 @@ public:
 	void SendToAllPlayers (std::string command);
 	void SendToOtherPlayers (unsigned long id, std::string command);
 	
+	
 	State actualState;
 	EventDispatcher ChangeState;
 	
-	GameState(
-		std::map<unsigned long, Player> players,
-		std::map<unsigned long, ClientData> *clients
-	);
-	
 	const unsigned short MAX_NUMBER = 90;
-	std::map<unsigned long, Player> players;
+	std::map<unsigned long, Player> *players;
 	std::map<unsigned long, ClientData> *clients;
 	std::list<unsigned short> baseNumbersList;
 	static std::mutex stateLock;

@@ -28,9 +28,9 @@ public:
 	static unsigned short CommandID (std::string command);
 	static bool DecodeUShort(std::string command, unsigned short& value);
 	
-	static std::string FormatValue(unsigned short);
 	
 private:
+	static std::string FormatValue(unsigned short);
 	
 };
 
