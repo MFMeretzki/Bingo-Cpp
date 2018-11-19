@@ -23,7 +23,7 @@ public:
 	
 private:
 	
-	static std::string FormatValue(unsigned short);
+	static std::string FormatValueCard(unsigned short);
 	
 };
 

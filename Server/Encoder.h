@@ -4,6 +4,7 @@
 #include "Card.h"
 #include <list>
 #include <string>
+#include <iostream>
 
 
 class Encoder {

@@ -1,13 +1,17 @@
 #include "GameState.h"
 
 
-GameState::GameState(std::map<unsigned long, Player> *players, std::map<unsigned long, ClientData> *clients)
+const unsigned short GameState::LINE_REWARD = 10;
+const unsigned short GameState::BINGO_REWARD = 20;
+
+
+GameState::GameState(std::map<unsigned long, Player> *players, std::map<unsigned long, ClientData*> *clients)
 {
 	this->players = players;
 	this->clients = clients;
 	
 	unsigned short i;
-	for (i=1; i<=MAX_NUMBER; ++i)
+	for (i=1; i<=90; ++i)
 	{
 		baseNumbersList.push_back(i);
 	}

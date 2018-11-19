@@ -21,9 +21,9 @@ bool ClientData::SpendCredit(int value) {
 	
 	if (value <= this->credit)
 	{
-		 this->credit -= value;
+		this->credit -= value;
 
-		std::string command = Encoder::EncodeUShort(Encoder::Command::CREDIT, credit);
+		std::string command = Encoder::EncodeUShort(Encoder::Command::CREDIT, (unsigned short)credit);
 		client->Write(command);
 		ok = true;
 	}
@@ -35,6 +35,6 @@ bool ClientData::SpendCredit(int value) {
 void ClientData::EarnCredit(int value) {
 	credit += value;
 
-	std::string command = Encoder::EncodeUShort(Encoder::Command::CREDIT, credit);
+	std::string command = Encoder::EncodeUShort(Encoder::Command::CREDIT, (unsigned short)credit);
 	client->Write(command);
 }

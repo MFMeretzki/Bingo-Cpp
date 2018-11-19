@@ -16,6 +16,9 @@ public:
 	~ClientConnection();
 	void Write (std::string msg);
 	
+	void StartReading();
+	
+	EventDispatcher clientMessage;
 	unsigned long ID;
 	
 private:
@@ -23,7 +26,6 @@ private:
 	void OnClientMessage(std::string msg);
 	
 	ServerSocket socket;
-	EventDispatcher clientMessage;
 	bool state;
 	
 	
