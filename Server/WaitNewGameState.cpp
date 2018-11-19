@@ -3,7 +3,7 @@
 
 WaitNewGameState::WaitNewGameState (
 	std::map<unsigned long, GameState::Player> *players,
-	std::map<unsigned long, ClientData> *clients
+	std::map<unsigned long, ClientData*> *clients
 ) : GameState (players, clients)
 {
 	this->alive = true;
@@ -20,8 +20,16 @@ WaitNewGameState::~WaitNewGameState ()
 }
 
 
+void WaitNewGameState::Start ()
+{
+	cm.notify_one();
+}
+
+
 void WaitNewGameState::ProcessCommand (ClientData *client, std::string command)
 {
+	ConcurrentOutput::Write("R" + command);
+	
 	unsigned short commandID = Encoder::CommandID(command);
 	if (commandID != 0)
 	{
@@ -31,6 +39,7 @@ void WaitNewGameState::ProcessCommand (ClientData *client, std::string command)
 			{
 				case Encoder::Command::CLIENT_CONNECTED:
 				{
+					ConcurrentOutput::Write("CLIENT_CONNECTED" + command);
 					auto now = std::chrono::high_resolution_clock::now();
 					std::chrono::duration<float> elapsed = now-startTime;
 					std::string sCommand = Encoder::EncodeUShort(
@@ -116,7 +125,7 @@ void WaitNewGameState::SendStartingNewGameMsg ()
 	{
 		for (auto it = this->clients->begin(); it!=this->clients->end(); ++it)
 		{
-			it->second.client->Write(command);
+			it->second->client->Write(command);
 		}
 	}
 	this->stateLock.unlock();
@@ -125,15 +134,18 @@ void WaitNewGameState::SendStartingNewGameMsg ()
 
 void WaitNewGameState::SendCards (ClientData *client, unsigned short nCards)
 {
-	if (nCards > 4)
-		nCards = 4;
+	unsigned short n = nCards;
+	if (n > 4)
+		n = 4;
 	
-	this->stateLock.lock();
+	
+	//this->stateLock.lock();
 	{
-		if (client->SpendCredit(GameLogic::CARD_PRICE * nCards))
+		if (client->SpendCredit(5 * n))
 		{
+			
 			std::list<Card> cards;
-			for (int i=0; i<nCards; ++i)
+			for (int i=0; i<n; ++i)
 			{
 				cards.push_back(GenerateCard());
 			}
@@ -145,7 +157,7 @@ void WaitNewGameState::SendCards (ClientData *client, unsigned short nCards)
 			client->client->Write(command);
 		}
 	}
-	this->stateLock.unlock();
+	//this->stateLock.unlock();
 }
 
 
@@ -155,7 +167,7 @@ Card WaitNewGameState::GenerateCard ()
 	unsigned short cardData[15];
 	do
 	{
-		std::list<unsigned short> list(baseNumbersList);
+		std::vector<unsigned short> vec(baseNumbersList.begin(), baseNumbersList.end());
 		for (int i=0; i<15; ++i)
 		{
 				NumberDistribution distribution(1, 90-i);
@@ -163,11 +175,13 @@ Card WaitNewGameState::GenerateCard ()
 				Generator numberGenerator(generator, distribution);
 				generator.seed(std::time(0));
 				
-				cardData[i] = (unsigned short)numberGenerator();
+				int index = (int)numberGenerator()-1;
+				cardData[i] =  vec[index];
+				vec.erase(vec.begin()+index);
 		}
 		
 		std::string stringCode = Card::SStringCode(cardData);
-		if (std::find(generatedCards.begin(), generatedCards.end(), stringCode) != generatedCards.end())
+		if (std::find(generatedCards.begin(), generatedCards.end(), stringCode) == generatedCards.end())
 		{
 			ok = true;
 			generatedCards.push_back(stringCode);
@@ -181,10 +195,12 @@ Card WaitNewGameState::GenerateCard ()
 
 void WaitNewGameState::StartNewGameThread (WaitNewGameState *obj)
 {
+	std::unique_lock<std::mutex> lock(obj->sm);
+	obj->cm.wait(lock);
+	std::cout << "STARTING_NEW_GAME" << std::endl;
 	do {
 		if (obj->players->size() == 0)
 		{
-			ConcurrentOutput::Write("WAIT_NEW_GAME");
 			obj->startTime = std::chrono::high_resolution_clock::now();
 			obj->SendStartingNewGameMsg();
 			std::chrono::seconds seconds (obj->WAITING_TIMEOUT);
@@ -192,12 +208,12 @@ void WaitNewGameState::StartNewGameThread (WaitNewGameState *obj)
 		}
 		else
 		{
-			obj->alive = false;
 			obj->actualState = GameState::State::GAME_STARTED;
-			
 			obj->ChangeState.dispatchEvent((int)obj->actualState);
+			obj->cm.wait(lock);
+			std::cout << "STARTING_NEW_GAME" << std::endl;
 		}
 		
 		
-	} while(obj->alive);
+	} while(true);
 }

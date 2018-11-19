@@ -76,7 +76,7 @@ bool Encoder::DecodeUShort(std::string command, unsigned short& value)
 }
 
 
-std::string FormatValue (unsigned short value)
+std::string Encoder::FormatValue (unsigned short value)
 {
 	std::string s;
 	

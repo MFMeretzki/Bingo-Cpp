@@ -1,14 +1,17 @@
 #ifndef WaitNewGameState_class
 #define WaitNewGameState_class
 
-#include "GameLogic.h"
 #include "GameState.h"
 #include "ConcurrentOutput.h"
 #include <list>
+#include <vector>
 #include <map>
 #include <string>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <chrono>
+#include <iostream>
 
 
 class WaitNewGameState : public GameState
@@ -17,11 +20,12 @@ public:
 	
 	WaitNewGameState (
 		std::map<unsigned long, GameState::Player> *players,
-		std::map<unsigned long, ClientData> *clients
+		std::map<unsigned long, ClientData*> *clients
 	);
 	~WaitNewGameState();
 	
 	// Methods
+	void Start();
 	void ProcessCommand (ClientData *client, std::string command);
 	void ClientConnect (ClientData *client);
 	bool ClientDisconnect (ClientData *client);
@@ -40,6 +44,9 @@ private:
 	static void StartNewGameThread (WaitNewGameState *obj);
 	
 	// Members
+	std::mutex sm;
+	std::condition_variable cm;
+	
 	std::list<std::string> generatedCards;
 	bool alive;
 	

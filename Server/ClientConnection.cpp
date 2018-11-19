@@ -4,23 +4,29 @@ ClientConnection::ClientConnection(unsigned long ID, ServerSocket& socket)
 {
 	this->ID = ID;
 	this->socket = socket;
-	this->state = true;
-	std::thread(ReadThread, this).detach();
+	this->state = false;
 }
 
 
 ClientConnection::~ClientConnection() { }
 
 
-void ClientConnection::Write (std::string msg)
+void ClientConnection::StartReading()
 {
-	this->socket << msg;
+	this->state = true;
+	std::thread(ReadThread, this).detach();
 }
 
 
-void ClientConnection::OnClientMessage(std::string msg)
+void ClientConnection::Write (std::string command)
 {
-	this->clientMessage.dispatchEvent(0);
+	this->socket << command;
+}
+
+
+void ClientConnection::OnClientMessage(std::string command)
+{
+	this->clientMessage.dispatchEventString(command, this->ID);
 }
 
 

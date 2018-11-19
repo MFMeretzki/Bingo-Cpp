@@ -51,7 +51,7 @@ std::string Card::StringCode ()
 	
 	for (int i=0; i<15; ++i)
 	{
-		code += FormatValue(this->values[i]);
+		code += FormatValueCard(this->values[i]);
 	}
 
 	return code;
@@ -64,14 +64,14 @@ std::string Card::SStringCode (unsigned short values[15]){
 	
 	for (int i=0; i<15; ++i)
 	{
-		code +=  FormatValue(values[i]);
+		code +=  FormatValueCard(values[i]);
 	}
 
 	return code;
 }
 
 
-std::string FormatValue (unsigned short value)
+std::string Card::FormatValueCard (unsigned short value)
 {
 	std::string s;
 	

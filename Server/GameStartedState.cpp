@@ -3,7 +3,7 @@
 	
 GameStartedState::GameStartedState(
 	std::map<unsigned long, GameState::Player> *players,
-	std::map<unsigned long, ClientData> *clients
+	std::map<unsigned long, ClientData*> *clients
 ) : GameState (players, clients)
 {
 	this->actualState = GameState::State::GAME_STARTED;
@@ -15,11 +15,20 @@ GameStartedState::GameStartedState(
 	
 	std::string command = Encoder::EncodeBase(Encoder::Command::GAME_BEGAN);
 	SendToAllPlayers(command);
+	
 	std::thread(BallRevealedThread, this).detach();
 }
 
 
 GameStartedState::~GameStartedState() { }
+
+
+void GameStartedState::Start()
+{
+	std::cout << "aaaaaaaaaaaaa" << std::endl;
+	cm.notify_one();
+	std::cout << "bbbbbbbbbbbbb" << std::endl;
+}
 
 
 void GameStartedState::InitBalls()
@@ -71,13 +80,17 @@ bool GameStartedState::ClientDisconnect (ClientData *client)
 
 void GameStartedState::BallRevealedThread (GameStartedState *obj)
 {
+	std::unique_lock<std::mutex> lock(obj->sm);
+	obj->cm.wait(lock);
+	std::cout << "STARTING_NEW_GAME" << std::endl;
+	
 	do
 	{
 		if (obj->bingoReached || obj->balls.size() == 0)
 		{
-			obj->alive = false;
 			obj->actualState = GameState::State::WAIT_NEW_GAME;
 			obj->ChangeState.dispatchEvent((int)obj->actualState);
+			obj->cm.wait(lock);
 		}
 		else
 		{
@@ -115,7 +128,7 @@ void GameStartedState::BallRevealedThread (GameStartedState *obj)
 				vector[3] = ball;
 				vector[3] = 0;
 				vector[3] = bingos;
-				unsigned short credit = GameLogic::BINGO_REWARD / winners.size();
+				unsigned short credit = BINGO_REWARD / winners.size();
 				for (auto it = winners.begin(); it != winners.end(); ++it)
 				{
 					it->clientData->EarnCredit(credit);
@@ -127,7 +140,7 @@ void GameStartedState::BallRevealedThread (GameStartedState *obj)
 				vector[3] = ball;
 				vector[3] = lines;
 				vector[3] = 0;
-				unsigned short credit = GameLogic::LINE_REWARD / winners.size();
+				unsigned short credit = LINE_REWARD / winners.size();
 				for (auto it = winners.begin(); it != winners.end(); ++it)
 				{
 					it->clientData->EarnCredit(credit);
@@ -142,8 +155,11 @@ void GameStartedState::BallRevealedThread (GameStartedState *obj)
 			
 			std::string command = Encoder::EncodeUShort3(Encoder::Command::BALL_REVEALED, vector);
 			obj->SendToAllPlayers(command);
+			std::chrono::seconds seconds (2);
+			std::this_thread::sleep_for(seconds);
+			std::cout << "STARTING_NEW_GAME" << std::endl;
 		}
 	}
-	while (obj->alive);
+	while (true);
 }
 
