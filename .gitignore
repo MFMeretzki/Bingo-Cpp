@@ -31,5 +31,9 @@
 *.out
 *.app
 
+LocalFiles/
+ReleaseResources/
+ClientBuild/
+
 # Folders
 Bin/
